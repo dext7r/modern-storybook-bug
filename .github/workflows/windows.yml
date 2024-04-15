@@ -4,7 +4,7 @@ on:
   pull_request:
 
 jobs:
-  test:
+  pnpm:
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
     runs-on: windows-2022
     strategy:
@@ -26,18 +26,6 @@ jobs:
           version: ${{ matrix.pnpm-version }}
           run_install: false
 
-      # - name: Get pnpm store directory
-      #   run: |
-      #     echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      # - name: Setup pnpm cache
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: ${{ env.STORE_PATH }}
-      #     key: ${{ runner.os }}-pnpm-store-${{ matrix.node-version }}-${{ matrix.pnpm-version }}-${{ hashFiles('**/pnpm-lock.yaml') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pnpm-store-${{ matrix.node-version }}-${{ matrix.pnpm-version }}-
-
       - name: Install dependencies
         run: pnpm install
       - name: build-storybook
@@ -45,4 +33,50 @@ jobs:
       - name: Install dependencies
         run: |
           - pnpm run storybook
-          - exit 0
+
+  yarn:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
+    runs-on: windows-2022
+    strategy:
+      matrix:
+        node-version: [21.6.2]
+        yarn-version: [1.22.2]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js and dependencies
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: yarn install
+      - name: build-storybook
+        run: yarn run build-storybook
+      - name: Install dependencies
+        run: |
+          - yarn run storybook
+
+  npm:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
+    runs-on: windows-2022
+    strategy:
+      matrix:
+        node-version: [21.6.2]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js and dependencies
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+      - name: build-storybook
+        run: npm run build-storybook
+      - name: Install dependencies
+        run: |
+          - npm run storybook
