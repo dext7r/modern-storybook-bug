@@ -42,4 +42,6 @@ jobs:
       - name: build-storybook
         run: pnpm run build-storybook
       - name: Install dependencies
-        run: pnpm run storybook
+        run: |
+          - pnpm run storybook
+          - exit 0

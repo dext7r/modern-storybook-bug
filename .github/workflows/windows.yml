@@ -1,0 +1,82 @@
+name: test
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  pnpm:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
+    runs-on: windows-2022
+    strategy:
+      matrix:
+        node-version: [21.6.2]
+        pnpm-version: [8.15.5]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js and dependencies
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ matrix.pnpm-version }}
+          run_install: false
+
+      - name: Install dependencies
+        run: pnpm install
+      - name: build-storybook
+        run: pnpm run build-storybook
+      - name: Install dependencies
+        run: |
+          - pnpm run storybook
+
+  yarn:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
+    runs-on: windows-2022
+    strategy:
+      matrix:
+        node-version: [21.6.2]
+        yarn-version: [1.22.2]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js and dependencies
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: yarn install
+      - name: build-storybook
+        run: yarn run build-storybook
+      - name: Install dependencies
+        run: |
+          - yarn run storybook
+
+  npm:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
+    runs-on: windows-2022
+    strategy:
+      matrix:
+        node-version: [21.6.2]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js and dependencies
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+      - name: build-storybook
+        run: npm run build-storybook
+      - name: Install dependencies
+        run: |
+          - npm run storybook
